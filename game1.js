@@ -138,9 +138,6 @@ function ensureSquareInCanvas() {
     if (squareX === null)
         setNewSquareCoords();
 
-    if (deathSquareX === null)
-        setNewSquareCoords();
-
     drawPoints();
     drawTimeLeft();
     drawSquare();
