@@ -21,15 +21,15 @@ let points = 0;
 const canvasWidth = 800;
 const canvasHeight = 600;
 let isGameOver = false;
-let roundTime = 30;
+let timeLeft = 30;
 let mouseX = null;
 let mouseY = null;
 
 
 function decreaseTimer() {
     setTimeout(() => {
-        roundTime--;
-        if (roundTime > 0)
+        timeLeft--;
+        if (timeLeft > 0)
             decreaseTimer();
         else
             isGameOver = true;
@@ -56,24 +56,37 @@ function drawPoints() {
 function drawTimeLeft() {
     ctx.fillStyle = 'white';
     ctx.font = "30px Arial";
-    ctx.fillText(`Time Left: ${roundTime}`, canvasWidth - 200, 30);
+    ctx.fillText(`Time Left: ${timeLeft}`, canvasWidth - 200, 30);
+}
+
+function getSquareSpeed() {
+    let runSpeed = 1;
+    if (timeLeft < 20)
+        runSpeed = 2;
+    else if (timeLeft < 10)
+        runSpeed = 3;
+    else if (timeLeft < 5)
+        runSpeed = 4;
+    return runSpeed;
 }
 
 function squareRunFromMouse() {
+    const runSpeed = getSquareSpeed();
+
     if (mouseX > squareX) {
-        squareX -= 2;
+        squareX -= runSpeed;
     }
 
     if (mouseX < squareX) {
-        squareX += 2;
+        squareX += runSpeed;
     }
 
     if (mouseY > squareY) {
-        squareY -= 2;
+        squareY -= runSpeed;
     }
 
     if (mouseY < squareY) {
-        squareY += 2;
+        squareY += runSpeed;
     }
 }
 
