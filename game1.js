@@ -21,7 +21,18 @@ let points = 0;
 const canvasWidth = 800;
 const canvasHeight = 600;
 let gameOver = false;
+let roundTime = 30;
 
+function decreaseTimer() {
+    setTimeout(() => {
+        roundTime--;
+        if (roundTime > 0)
+            decreaseTimer();
+        else
+            gameOver = true;
+    }, 1000);
+}
+decreaseTimer();
 
 (function animationLoop(){
     if (!gameOver)
@@ -32,7 +43,9 @@ let gameOver = false;
 
     ctx.fillStyle = 'white';
     ctx.font = "30px Arial";
-    ctx.fillText(`Points ${points}`, 10, 50);
+    ctx.fillText(`Points ${points}`, 10, 30);
+
+    ctx.fillText(`Time Left: ${roundTime}`, canvasWidth - 200, 30);
 
     if (randomX === null) {
         randomX = Math.floor(Math.random() * 600 + 100); // 100-700
