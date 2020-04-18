@@ -13,8 +13,8 @@ const rect = canvas.getBoundingClientRect();
 
 
 let squareCenter = null;
-let randomX = null;
-let randomY = null;
+let squareX = null;
+let squareY = null;
 let size = 5;
 let counter = 0;
 let points = 0;
@@ -22,6 +22,8 @@ const canvasWidth = 800;
 const canvasHeight = 600;
 let isGameOver = false;
 let roundTime = 30;
+let mouseX = null;
+let mouseY = null;
 
 
 function decreaseTimer() {
@@ -34,6 +36,47 @@ function decreaseTimer() {
     }, 1000);
 }
 decreaseTimer();
+
+function setNewSquareCoords() {
+    squareX = Math.floor(Math.random() * 600 + 100); // 100-700
+    squareY = Math.floor(Math.random() * 400 + 100); // 100-500
+}
+
+function drawSquare() {
+    ctx.fillStyle = 'red';
+    ctx.fillRect(squareX, squareY, size, size);
+}
+
+function drawPoints() {
+    ctx.fillStyle = 'white';
+    ctx.font = "30px Arial";
+    ctx.fillText(`Points ${points}`, 10, 30);
+}
+
+function drawTimeLeft() {
+    ctx.fillStyle = 'white';
+    ctx.font = "30px Arial";
+    ctx.fillText(`Time Left: ${roundTime}`, canvasWidth - 200, 30);
+}
+
+function squareRunFromMouse() {
+    if (mouseX > squareX) {
+        squareX -= 2;
+    }
+
+    if (mouseX < squareX) {
+        squareX += 2;
+    }
+
+    if (mouseY > squareY) {
+        squareY -= 2;
+    }
+
+    if (mouseY < squareY) {
+        squareY += 2;
+    }
+
+}
 
 (function animationLoop(){
     if (!isGameOver)
@@ -48,25 +91,19 @@ decreaseTimer();
         ctx.fillText('Game Over!!', 250, 300);
     }
 
-    ctx.fillStyle = 'white';
-    ctx.font = "30px Arial";
-    ctx.fillText(`Points ${points}`, 10, 30);
+    if (squareX === null)
+        setNewSquareCoords();
 
-    ctx.fillText(`Time Left: ${roundTime}`, canvasWidth - 200, 30);
-
-    if (randomX === null) {
-        randomX = Math.floor(Math.random() * 600 + 100); // 100-700
-        randomY = Math.floor(Math.random() * 400 + 100); // 100-500
-
-    }
-
-    ctx.fillStyle = 'red';
-    ctx.fillRect(randomX, randomY, size, size);
-
+    drawPoints();
+    drawTimeLeft();
+    drawSquare();
     counter++;
 
     if ((counter % 3) === 0)
         size++;
+
+    if ((counter % 2) === 0)
+        squareRunFromMouse();
 })();
 
 
@@ -74,14 +111,19 @@ canvas.addEventListener('mousedown', e => {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    const xMatches = (x > randomX) && (x < randomX + size);
-    const yMatches = (y > randomY) && (y < randomY + size);
+    const xMatches = (x > squareX) && (x < squareX + size);
+    const yMatches = (y > squareY) && (y < squareY + size);
     if (xMatches && yMatches) {
         points += Math.max(105 - size, 0);
         size = 5;
-        randomX = null;
-        randomY = null;
+        squareX = null;
+        squareY = null;
     } else {
         isGameOver = true;
     }
+});
+
+canvas.addEventListener('mousemove', e => {
+    mouseX = e.clientX - rect.left;
+    mouseY = e.clientY - rect.top;
 });
