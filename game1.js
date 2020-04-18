@@ -24,6 +24,9 @@ let isGameOver = false;
 let timeLeft = 30;
 let mouseX = null;
 let mouseY = null;
+let deathSquareX = 0;
+let deathSquareY = 0;
+const deathSquareSize = 5;
 
 
 function decreaseTimer() {
@@ -45,6 +48,11 @@ function setNewSquareCoords() {
 function drawSquare() {
     ctx.fillStyle = 'red';
     ctx.fillRect(squareX, squareY, size, size);
+}
+
+function drawDeathSquare() {
+    ctx.fillStyle = 'blue';
+    ctx.fillRect(deathSquareX, deathSquareY, deathSquareSize, deathSquareSize);
 }
 
 function drawPoints() {
@@ -96,6 +104,26 @@ function squareRunFromMouse() {
     }
 }
 
+function deathSquareChaseMouse() {
+    const runSpeed = 1;
+
+    if (mouseX > deathSquareX) {
+        deathSquareX += runSpeed;
+    }
+
+    if (mouseX < deathSquareX) {
+        deathSquareX -= runSpeed;
+    }
+
+    if (mouseY > deathSquareY) {
+        deathSquareY += runSpeed;
+    }
+
+    if (mouseY < deathSquareY) {
+        deathSquareY -= runSpeed;
+    }
+}
+
 function ensureSquareInCanvas() {
     if (squareX < 0)
         squareX = 0;
@@ -120,9 +148,14 @@ function ensureSquareInCanvas() {
     if (squareX === null)
         setNewSquareCoords();
 
+    if (deathSquareX === null)
+        setNewSquareCoords();
+
     drawPoints();
     drawTimeLeft();
     drawSquare();
+    drawDeathSquare();
+
     if (isGameOver)
         drawGameOver();
 
@@ -132,6 +165,8 @@ function ensureSquareInCanvas() {
 
     if ((counter % 2) === 0)
         squareRunFromMouse();
+
+    deathSquareChaseMouse();
 
     ensureSquareInCanvas();
 })();
@@ -156,4 +191,10 @@ canvas.addEventListener('mousedown', e => {
 canvas.addEventListener('mousemove', e => {
     mouseX = e.clientX - rect.left;
     mouseY = e.clientY - rect.top;
+
+    const xMatches = (mouseX > deathSquareX) && (mouseX < deathSquareX + deathSquareSize);
+    const yMatches = (mouseY > deathSquareY) && (mouseY < deathSquareY + deathSquareSize);
+    if (xMatches && yMatches)
+        isGameOver = true;
+
 });
