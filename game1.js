@@ -75,7 +75,20 @@ function squareRunFromMouse() {
     if (mouseY < squareY) {
         squareY += 2;
     }
+}
 
+function ensureSquareInCanvas() {
+    if (squareX < 0)
+        squareX = 0;
+
+    if (squareY < 0)
+        squareY = 0;
+
+    if (squareX + size > canvasWidth)
+        squareX = canvasWidth - size;
+
+    if (squareY + size > canvasHeight)
+        squareY = canvasHeight - size;
 }
 
 (function animationLoop(){
@@ -104,6 +117,8 @@ function squareRunFromMouse() {
 
     if ((counter % 2) === 0)
         squareRunFromMouse();
+
+    ensureSquareInCanvas();
 })();
 
 
