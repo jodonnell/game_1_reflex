@@ -20,8 +20,9 @@ let counter = 0;
 let points = 0;
 const canvasWidth = 800;
 const canvasHeight = 600;
-let gameOver = false;
+let isGameOver = false;
 let roundTime = 30;
+
 
 function decreaseTimer() {
     setTimeout(() => {
@@ -29,17 +30,23 @@ function decreaseTimer() {
         if (roundTime > 0)
             decreaseTimer();
         else
-            gameOver = true;
+            isGameOver = true;
     }, 1000);
 }
 decreaseTimer();
 
 (function animationLoop(){
-    if (!gameOver)
+    if (!isGameOver)
         window.requestAnimationFrame(animationLoop);
 
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+    if (isGameOver) {
+        ctx.fillStyle = 'white';
+        ctx.font = "50px Arial";
+        ctx.fillText('Game Over!!', 250, 300);
+    }
 
     ctx.fillStyle = 'white';
     ctx.font = "30px Arial";
@@ -75,6 +82,6 @@ canvas.addEventListener('mousedown', e => {
         randomX = null;
         randomY = null;
     } else {
-        gameOver = true;
+        isGameOver = true;
     }
 });
