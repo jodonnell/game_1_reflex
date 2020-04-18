@@ -1,25 +1,15 @@
-function keydown(event) {
-    if (event.keyCode === 32) {
-        console.log('here')
-    }
-}
-
-document.addEventListener('keydown', keydown, false);
-
-
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const rect = canvas.getBoundingClientRect();
 
-
+const canvasWidth = 800;
+const canvasHeight = 600;
 let squareCenter = null;
 let squareX = null;
 let squareY = null;
 let size = 5;
 let counter = 0;
 let points = 0;
-const canvasWidth = 800;
-const canvasHeight = 600;
 let isGameOver = false;
 let timeLeft = 30;
 let mouseX = canvasWidth / 2;
