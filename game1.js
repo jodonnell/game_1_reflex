@@ -59,6 +59,12 @@ function drawTimeLeft() {
     ctx.fillText(`Time Left: ${timeLeft}`, canvasWidth - 200, 30);
 }
 
+function drawGameOver() {
+    ctx.fillStyle = 'white';
+    ctx.font = "50px Arial";
+    ctx.fillText('Game Over!!', 250, 300);
+}
+
 function getSquareSpeed() {
     let runSpeed = 1;
     if (timeLeft < 20)
@@ -111,20 +117,16 @@ function ensureSquareInCanvas() {
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    if (isGameOver) {
-        ctx.fillStyle = 'white';
-        ctx.font = "50px Arial";
-        ctx.fillText('Game Over!!', 250, 300);
-    }
-
     if (squareX === null)
         setNewSquareCoords();
 
     drawPoints();
     drawTimeLeft();
     drawSquare();
-    counter++;
+    if (isGameOver)
+        drawGameOver();
 
+    counter++;
     if ((counter % 3) === 0)
         size++;
 
