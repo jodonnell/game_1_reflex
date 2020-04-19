@@ -4,6 +4,7 @@ const rect = canvas.getBoundingClientRect();
 
 const canvasWidth = 800;
 const canvasHeight = 600;
+let damageMultiplier = 1;
 let squareCenter = null;
 let squareX = null;
 let squareY = null;
@@ -97,22 +98,23 @@ function squareRunFromMouse() {
 function deathSquareChaseMouse() {
     const runSpeed = 1;
 
-    if (mouseX > deathSquareX) {
+    if (mouseX > deathSquareX + 2) {
         deathSquareX += runSpeed;
     }
 
-    if (mouseX < deathSquareX) {
+    if (mouseX < deathSquareX + 2 ) {
         deathSquareX -= runSpeed;
     }
 
-    if (mouseY > deathSquareY) {
+    if (mouseY > deathSquareY + 2) {
         deathSquareY += runSpeed;
     }
 
-    if (mouseY < deathSquareY) {
+    if (mouseY < deathSquareY + 2) {
         deathSquareY -= runSpeed;
     }
 }
+
 
 function ensureSquareInCanvas() {
     if (squareX < 0)
@@ -128,23 +130,78 @@ function ensureSquareInCanvas() {
         squareY = canvasHeight - size;
 }
 
+
+//////////////////////MARK'S CODE//////////////////////////////
+function drawRectangle(color,dimensions){
+  ctx.fillStyle = color;
+  ctx.fillRect(...dimensions);
+
+}
+
+function Flash(color,x,y,w,h){
+	this.dim = [x,y,w,h];
+	this.color = color;
+	this.alpha = 0;
+	this.draw = ()=>{
+	  if(this.alpha <=0) return
+	  ctx.save()
+	  ctx.globalAlpha = this.alpha;
+	  drawRectangle(this.color,this.dim)
+	  ctx.restore()
+	}
+   	this.update = () =>{
+	  if (this.alpha > 0)
+	  this.alpha -= .2
+	}
+}
+
+var screenFlash = new Flash('magenta',0,0,canvasWidth,canvasHeight)
+
+function takeDamage(){
+  screenFlash.alpha = 1;
+  timeLeft = Math.max(timeLeft - damageMultiplier, 0);
+  damageMultiplier = Math.min(damageMultiplier+1,3)
+  if(timeLeft == 0) isGameOver = true
+}
+
+function checkDeathSquareCollision(){
+
+    const xMatches = (mouseX > deathSquareX) && (mouseX < deathSquareX + deathSquareSize);
+    const yMatches = (mouseY > deathSquareY) && (mouseY < deathSquareY + deathSquareSize);
+    if (xMatches && yMatches)
+        takeDamage();
+}
+
+
+////////////////////////////////////////////////////////////
+
+
+
 (function animationLoop(){
     if (!isGameOver)
         window.requestAnimationFrame(animationLoop);
-
+    	
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+     screenFlash.draw();
+    screenFlash.update();
 
     if (squareX === null)
         setNewSquareCoords();
 
+
+    if(isGameOver){
+	drawGameOver();
+	return;
+    }
+   
+  
     drawPoints();
     drawTimeLeft();
     drawSquare();
     drawDeathSquare();
 
-    if (isGameOver)
-        drawGameOver();
 
     counter++;
     if ((counter % 3) === 0)
@@ -154,7 +211,7 @@ function ensureSquareInCanvas() {
         squareRunFromMouse();
 
     deathSquareChaseMouse();
-
+    checkDeathSquareCollision();	
     ensureSquareInCanvas();
 })();
 
@@ -171,17 +228,12 @@ canvas.addEventListener('mousedown', e => {
         squareX = null;
         squareY = null;
     } else {
-        isGameOver = true;
+        takeDamage();
     }
 });
 
 canvas.addEventListener('mousemove', e => {
     mouseX = e.clientX - rect.left;
     mouseY = e.clientY - rect.top;
-
-    const xMatches = (mouseX > deathSquareX) && (mouseX < deathSquareX + deathSquareSize);
-    const yMatches = (mouseY > deathSquareY) && (mouseY < deathSquareY + deathSquareSize);
-    if (xMatches && yMatches)
-        isGameOver = true;
 
 });
