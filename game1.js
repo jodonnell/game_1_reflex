@@ -132,16 +132,18 @@ function ensureSquareInCanvas() {
 
 
 //////////////////////MARK'S CODE//////////////////////////////
+
 function drawRectangle(color,dimensions){
   ctx.fillStyle = color;
   ctx.fillRect(...dimensions);
 
 }
 
-function Flash(color,x,y,w,h){
+function Flash(x,y,w,h,color, speed = .2, alpha = 0){
 	this.dim = [x,y,w,h];
+	this.speed = speed;
 	this.color = color;
-	this.alpha = 0;
+	this.alpha = alpha;
 	this.draw = ()=>{
 	  if(this.alpha <=0) return
 	  ctx.save()
@@ -150,12 +152,47 @@ function Flash(color,x,y,w,h){
 	  ctx.restore()
 	}
    	this.update = () =>{
-	  if (this.alpha > 0)
-	  this.alpha -= .2
+	  if (this.speed > 0 && this.alpha > 0)
+	  this.alpha -= this.speed
+	}
+	this.activate = (dim)=>{
+	  this.alpha = 1;
+	  this.dim = dim;
 	}
 }
+var timeFX = []
 
-var screenFlash = new Flash('magenta',0,0,canvasWidth,canvasHeight)
+function createTimerGFX(){
+  let 	x = canvasWidth - 10,
+	y = 0,
+	height = 20,
+	width = 10;
+  for (i=0 ; i<timeLeft; i++){
+    timeFX.unshift(new Flash(x,y + i * height,width,height-1,'red',0,1))
+  }
+}
+createTimerGFX()
+
+function updateTimeFX(){
+	if (timeLeft == timeFX.length)return
+	
+	timeFX.forEach((block,i) => {
+		if (timeLeft <= i){
+		block.speed=.05
+		block.color = 'white'
+		block.update();
+		}
+		block.draw();
+	})
+}
+function drawTimeFX(){
+	timeFX.forEach(block => {
+		block.draw();
+	})
+}
+
+var explodeFX = new Flash(0,0,0,0,'white',.1);
+var screenFlash = new Flash(0,0,canvasWidth,canvasHeight,'magenta')
 
 function takeDamage(){
   screenFlash.alpha = 1;
@@ -184,20 +221,25 @@ function checkDeathSquareCollision(){
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-     screenFlash.draw();
-    screenFlash.update();
+    screenFlash.draw();
+    
 
     if (squareX === null)
         setNewSquareCoords();
 
+    drawPoints();
 
     if(isGameOver){
 	drawGameOver();
 	return;
     }
-   
-  
-    drawPoints();
+    
+    explodeFX.draw();
+    timeFX.forEach( block => {
+	block.draw()
+    })
+    
+    updateTimeFX()
     drawTimeLeft();
     drawSquare();
     drawDeathSquare();
@@ -213,6 +255,8 @@ function checkDeathSquareCollision(){
     deathSquareChaseMouse();
     checkDeathSquareCollision();	
     ensureSquareInCanvas();
+    screenFlash.update();
+    explodeFX.update();
 })();
 
 
@@ -223,6 +267,7 @@ canvas.addEventListener('mousedown', e => {
     const xMatches = (x > squareX) && (x < squareX + size);
     const yMatches = (y > squareY) && (y < squareY + size);
     if (xMatches && yMatches) {
+	explodeFX.activate([squareX,squareY,size,size])
         points += Math.max(105 - size, 0);
         size = 5;
         squareX = null;
