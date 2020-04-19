@@ -23,7 +23,7 @@ const deathSquareSize = 5;
 function decreaseTimer() {
     setTimeout(() => {
         timeLeft--;
-        if (timeLeft > 0)
+        if (timeLeft > -1)
             decreaseTimer();
         else
             isGameOver = true;
@@ -175,7 +175,8 @@ createTimerGFX()
 
 function updateTimeFX(){
 	if (timeLeft == timeFX.length)return
-	
+	ctx.fillStyle = 'black'
+	ctx.fillRect(canvasWidth - 10,0,10,canvasHeight)
 	timeFX.forEach((block,i) => {
 		if (timeLeft <= i){
 		block.speed=.05
@@ -196,9 +197,9 @@ var screenFlash = new Flash(0,0,canvasWidth,canvasHeight,'magenta')
 
 function takeDamage(){
   screenFlash.alpha = 1;
-  timeLeft = Math.max(timeLeft - damageMultiplier, 0);
+  timeLeft = Math.max(timeLeft - damageMultiplier, -1);
   damageMultiplier = Math.min(damageMultiplier+1,3)
-  if(timeLeft == 0) isGameOver = true
+  if(timeLeft == -1) isGameOver = true
 }
 
 function checkDeathSquareCollision(){
@@ -239,11 +240,11 @@ function checkDeathSquareCollision(){
 	block.draw()
     })
     
-    updateTimeFX()
+    
     drawTimeLeft();
     drawSquare();
     drawDeathSquare();
-
+    updateTimeFX()
 
     counter++;
     if ((counter % 3) === 0)
